@@ -10,7 +10,9 @@ from kaitaistruct import __version__ as ks_version, KaitaiStruct, KaitaiStream, 
 
 
 if parse_version(ks_version) < parse_version('0.7'):
-    raise Exception("Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s" % (ks_version))
+    raise Exception(
+        "Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s" % (ks_version))
+
 
 class MachO(KaitaiStruct):
 
@@ -136,6 +138,7 @@ class MachO(KaitaiStruct):
         x86_64 = 16777223
         powerpc64 = 16777234
         any = 4294967295
+
     def __init__(self, _io, _parent=None, _root=None):
         self._io = _io
         self._parent = _parent
@@ -144,8 +147,8 @@ class MachO(KaitaiStruct):
         self.header = self._root.MachHeader(self._io, self, self._root)
         self.load_commands = [None] * (self.header.ncmds)
         for i in range(self.header.ncmds):
-            self.load_commands[i] = self._root.LoadCommand(self._io, self, self._root)
-
+            self.load_commands[i] = self._root.LoadCommand(
+                self._io, self, self._root)
 
     class RpathCommand(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -153,8 +156,8 @@ class MachO(KaitaiStruct):
             self._parent = _parent
             self._root = _root if _root else self
             self.path_offset = self._io.read_u4le()
-            self.path = (self._io.read_bytes_term(0, False, True, True)).decode(u"utf-8")
-
+            self.path = (self._io.read_bytes_term(
+                0, False, True, True)).decode("utf-8")
 
     class Uleb128(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -189,15 +192,14 @@ class MachO(KaitaiStruct):
             if (self.b9 & 128) != 0:
                 self.b10 = self._io.read_u1()
 
-
         @property
         def value(self):
             if hasattr(self, '_m_value'):
                 return self._m_value if hasattr(self, '_m_value') else None
 
-            self._m_value = (((self.b1 % 128) << 0) + (0 if (self.b1 & 128) == 0 else (((self.b2 % 128) << 7) + (0 if (self.b2 & 128) == 0 else (((self.b3 % 128) << 14) + (0 if (self.b3 & 128) == 0 else (((self.b4 % 128) << 21) + (0 if (self.b4 & 128) == 0 else (((self.b5 % 128) << 28) + (0 if (self.b5 & 128) == 0 else (((self.b6 % 128) << 35) + (0 if (self.b6 & 128) == 0 else (((self.b7 % 128) << 42) + (0 if (self.b7 & 128) == 0 else (((self.b8 % 128) << 49) + (0 if (self.b8 & 128) == 0 else (((self.b9 % 128) << 56) + (0 if (self.b8 & 128) == 0 else ((self.b10 % 128) << 63)))))))))))))))))))
+            self._m_value = (((self.b1 % 128) << 0) + (0 if (self.b1 & 128) == 0 else (((self.b2 % 128) << 7) + (0 if (self.b2 & 128) == 0 else (((self.b3 % 128) << 14) + (0 if (self.b3 & 128) == 0 else (((self.b4 % 128) << 21) + (0 if (self.b4 & 128) == 0 else (((self.b5 % 128) << 28) + (0 if (self.b5 & 128)
+                                                                                                                                                                                                                                                                                                  == 0 else (((self.b6 % 128) << 35) + (0 if (self.b6 & 128) == 0 else (((self.b7 % 128) << 42) + (0 if (self.b7 & 128) == 0 else (((self.b8 % 128) << 49) + (0 if (self.b8 & 128) == 0 else (((self.b9 % 128) << 56) + (0 if (self.b8 & 128) == 0 else ((self.b10 % 128) << 63)))))))))))))))))))
             return self._m_value if hasattr(self, '_m_value') else None
-
 
     class SourceVersionCommand(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -205,7 +207,6 @@ class MachO(KaitaiStruct):
             self._parent = _parent
             self._root = _root if _root else self
             self.version = self._io.read_u8le()
-
 
     class CsBlob(KaitaiStruct):
 
@@ -217,6 +218,7 @@ class MachO(KaitaiStruct):
             embedded_signature = 4208856256
             detached_signature = 4208856257
             entitlement = 4208882033
+
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
@@ -247,11 +249,13 @@ class MachO(KaitaiStruct):
             elif _on == self._root.CsBlob.CsMagic.code_directory:
                 self._raw_body = self._io.read_bytes((self.length - 8))
                 io = KaitaiStream(BytesIO(self._raw_body))
-                self.body = self._root.CsBlob.CodeDirectory(io, self, self._root)
+                self.body = self._root.CsBlob.CodeDirectory(
+                    io, self, self._root)
             elif _on == self._root.CsBlob.CsMagic.requirements:
                 self._raw_body = self._io.read_bytes((self.length - 8))
                 io = KaitaiStream(BytesIO(self._raw_body))
-                self.body = self._root.CsBlob.Entitlements(io, self, self._root)
+                self.body = self._root.CsBlob.Entitlements(
+                    io, self, self._root)
             else:
                 self.body = self._io.read_bytes((self.length - 8))
 
@@ -261,7 +265,6 @@ class MachO(KaitaiStruct):
                 self._parent = _parent
                 self._root = _root if _root else self
                 self.data = self._io.read_bytes_full()
-
 
         class CodeDirectory(KaitaiStruct):
             def __init__(self, _io, _parent=None, _root=None):
@@ -286,7 +289,6 @@ class MachO(KaitaiStruct):
                 if self.version >= 131584:
                     self.team_id_offset = self._io.read_u4be()
 
-
             @property
             def ident(self):
                 if hasattr(self, '_m_ident'):
@@ -294,7 +296,8 @@ class MachO(KaitaiStruct):
 
                 _pos = self._io.pos()
                 self._io.seek((self.ident_offset - 8))
-                self._m_ident = (self._io.read_bytes_term(0, False, True, True)).decode(u"utf-8")
+                self._m_ident = (self._io.read_bytes_term(
+                    0, False, True, True)).decode("utf-8")
                 self._io.seek(_pos)
                 return self._m_ident if hasattr(self, '_m_ident') else None
 
@@ -305,7 +308,8 @@ class MachO(KaitaiStruct):
 
                 _pos = self._io.pos()
                 self._io.seek((self.team_id_offset - 8))
-                self._m_team_id = (self._io.read_bytes_term(0, False, True, True)).decode(u"utf-8")
+                self._m_team_id = (self._io.read_bytes_term(
+                    0, False, True, True)).decode("utf-8")
                 self._io.seek(_pos)
                 return self._m_team_id if hasattr(self, '_m_team_id') else None
 
@@ -315,14 +319,15 @@ class MachO(KaitaiStruct):
                     return self._m_hashes if hasattr(self, '_m_hashes') else None
 
                 _pos = self._io.pos()
-                self._io.seek(((self.hash_offset - 8) - (self.hash_size * self.n_special_slots)))
-                self._m_hashes = [None] * ((self.n_special_slots + self.n_code_slots))
+                self._io.seek(((self.hash_offset - 8) -
+                               (self.hash_size * self.n_special_slots)))
+                self._m_hashes = [None] * \
+                    ((self.n_special_slots + self.n_code_slots))
                 for i in range((self.n_special_slots + self.n_code_slots)):
                     self._m_hashes[i] = self._io.read_bytes(self.hash_size)
 
                 self._io.seek(_pos)
                 return self._m_hashes if hasattr(self, '_m_hashes') else None
-
 
         class EntitlementsBlobIndex(KaitaiStruct):
 
@@ -331,11 +336,13 @@ class MachO(KaitaiStruct):
                 guest = 2
                 designated = 3
                 library = 4
+
             def __init__(self, _io, _parent=None, _root=None):
                 self._io = _io
                 self._parent = _parent
                 self._root = _root if _root else self
-                self.type = self._root.CsBlob.EntitlementsBlobIndex.RequirementType(self._io.read_u4be())
+                self.type = self._root.CsBlob.EntitlementsBlobIndex.RequirementType(
+                    self._io.read_u4be())
                 self.offset = self._io.read_u4be()
 
             @property
@@ -349,7 +356,6 @@ class MachO(KaitaiStruct):
                 self._io.seek(_pos)
                 return self._m_value if hasattr(self, '_m_value') else None
 
-
         class Data(KaitaiStruct):
             def __init__(self, _io, _parent=None, _root=None):
                 self._io = _io
@@ -359,7 +365,6 @@ class MachO(KaitaiStruct):
                 self.value = self._io.read_bytes(self.length)
                 self.padding = self._io.read_bytes((4 - (self.length & 3)))
 
-
         class SuperBlob(KaitaiStruct):
             def __init__(self, _io, _parent=None, _root=None):
                 self._io = _io
@@ -368,9 +373,8 @@ class MachO(KaitaiStruct):
                 self.count = self._io.read_u4be()
                 self.blobs = [None] * (self.count)
                 for i in range(self.count):
-                    self.blobs[i] = self._root.CsBlob.BlobIndex(self._io, self, self._root)
-
-
+                    self.blobs[i] = self._root.CsBlob.BlobIndex(
+                        self._io, self, self._root)
 
         class Expr(KaitaiStruct):
 
@@ -396,6 +400,7 @@ class MachO(KaitaiStruct):
             class CertSlot(Enum):
                 left_cert = 0
                 anchor_cert = 4294967295
+
             def __init__(self, _io, _parent=None, _root=None):
                 self._io = _io
                 self._parent = _parent
@@ -403,85 +408,104 @@ class MachO(KaitaiStruct):
                 self.op = self._root.CsBlob.Expr.OpEnum(self._io.read_u4be())
                 _on = self.op
                 if _on == self._root.CsBlob.Expr.OpEnum.cert_generic:
-                    self.data = self._root.CsBlob.Expr.CertGenericExpr(self._io, self, self._root)
+                    self.data = self._root.CsBlob.Expr.CertGenericExpr(
+                        self._io, self, self._root)
                 elif _on == self._root.CsBlob.Expr.OpEnum.apple_generic_anchor:
-                    self.data = self._root.CsBlob.Expr.AppleGenericAnchorExpr(self._io, self, self._root)
+                    self.data = self._root.CsBlob.Expr.AppleGenericAnchorExpr(
+                        self._io, self, self._root)
                 elif _on == self._root.CsBlob.Expr.OpEnum.info_key_field:
-                    self.data = self._root.CsBlob.Expr.InfoKeyFieldExpr(self._io, self, self._root)
+                    self.data = self._root.CsBlob.Expr.InfoKeyFieldExpr(
+                        self._io, self, self._root)
                 elif _on == self._root.CsBlob.Expr.OpEnum.and_op:
-                    self.data = self._root.CsBlob.Expr.AndExpr(self._io, self, self._root)
+                    self.data = self._root.CsBlob.Expr.AndExpr(
+                        self._io, self, self._root)
                 elif _on == self._root.CsBlob.Expr.OpEnum.anchor_hash:
-                    self.data = self._root.CsBlob.Expr.AnchorHashExpr(self._io, self, self._root)
+                    self.data = self._root.CsBlob.Expr.AnchorHashExpr(
+                        self._io, self, self._root)
                 elif _on == self._root.CsBlob.Expr.OpEnum.info_key_value:
-                    self.data = self._root.CsBlob.Data(self._io, self, self._root)
+                    self.data = self._root.CsBlob.Data(
+                        self._io, self, self._root)
                 elif _on == self._root.CsBlob.Expr.OpEnum.or_op:
-                    self.data = self._root.CsBlob.Expr.OrExpr(self._io, self, self._root)
+                    self.data = self._root.CsBlob.Expr.OrExpr(
+                        self._io, self, self._root)
                 elif _on == self._root.CsBlob.Expr.OpEnum.trusted_cert:
-                    self.data = self._root.CsBlob.Expr.CertSlotExpr(self._io, self, self._root)
+                    self.data = self._root.CsBlob.Expr.CertSlotExpr(
+                        self._io, self, self._root)
                 elif _on == self._root.CsBlob.Expr.OpEnum.not_op:
-                    self.data = self._root.CsBlob.Expr(self._io, self, self._root)
+                    self.data = self._root.CsBlob.Expr(
+                        self._io, self, self._root)
                 elif _on == self._root.CsBlob.Expr.OpEnum.ident:
-                    self.data = self._root.CsBlob.Expr.IdentExpr(self._io, self, self._root)
+                    self.data = self._root.CsBlob.Expr.IdentExpr(
+                        self._io, self, self._root)
                 elif _on == self._root.CsBlob.Expr.OpEnum.cert_field:
-                    self.data = self._root.CsBlob.Expr.CertFieldExpr(self._io, self, self._root)
+                    self.data = self._root.CsBlob.Expr.CertFieldExpr(
+                        self._io, self, self._root)
                 elif _on == self._root.CsBlob.Expr.OpEnum.entitlement_field:
-                    self.data = self._root.CsBlob.Expr.EntitlementFieldExpr(self._io, self, self._root)
+                    self.data = self._root.CsBlob.Expr.EntitlementFieldExpr(
+                        self._io, self, self._root)
                 elif _on == self._root.CsBlob.Expr.OpEnum.cd_hash:
-                    self.data = self._root.CsBlob.Data(self._io, self, self._root)
+                    self.data = self._root.CsBlob.Data(
+                        self._io, self, self._root)
 
             class InfoKeyFieldExpr(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
                     self._io = _io
                     self._parent = _parent
                     self._root = _root if _root else self
-                    self.data = self._root.CsBlob.Data(self._io, self, self._root)
-                    self.match = self._root.CsBlob.Match(self._io, self, self._root)
-
+                    self.data = self._root.CsBlob.Data(
+                        self._io, self, self._root)
+                    self.match = self._root.CsBlob.Match(
+                        self._io, self, self._root)
 
             class CertSlotExpr(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
                     self._io = _io
                     self._parent = _parent
                     self._root = _root if _root else self
-                    self.value = self._root.CsBlob.Expr.CertSlot(self._io.read_u4be())
-
+                    self.value = self._root.CsBlob.Expr.CertSlot(
+                        self._io.read_u4be())
 
             class CertGenericExpr(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
                     self._io = _io
                     self._parent = _parent
                     self._root = _root if _root else self
-                    self.cert_slot = self._root.CsBlob.Expr.CertSlot(self._io.read_u4be())
-                    self.data = self._root.CsBlob.Data(self._io, self, self._root)
-                    self.match = self._root.CsBlob.Match(self._io, self, self._root)
-
+                    self.cert_slot = self._root.CsBlob.Expr.CertSlot(
+                        self._io.read_u4be())
+                    self.data = self._root.CsBlob.Data(
+                        self._io, self, self._root)
+                    self.match = self._root.CsBlob.Match(
+                        self._io, self, self._root)
 
             class IdentExpr(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
                     self._io = _io
                     self._parent = _parent
                     self._root = _root if _root else self
-                    self.identifier = self._root.CsBlob.Data(self._io, self, self._root)
-
+                    self.identifier = self._root.CsBlob.Data(
+                        self._io, self, self._root)
 
             class CertFieldExpr(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
                     self._io = _io
                     self._parent = _parent
                     self._root = _root if _root else self
-                    self.cert_slot = self._root.CsBlob.Expr.CertSlot(self._io.read_u4be())
-                    self.data = self._root.CsBlob.Data(self._io, self, self._root)
-                    self.match = self._root.CsBlob.Match(self._io, self, self._root)
-
+                    self.cert_slot = self._root.CsBlob.Expr.CertSlot(
+                        self._io.read_u4be())
+                    self.data = self._root.CsBlob.Data(
+                        self._io, self, self._root)
+                    self.match = self._root.CsBlob.Match(
+                        self._io, self, self._root)
 
             class AnchorHashExpr(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
                     self._io = _io
                     self._parent = _parent
                     self._root = _root if _root else self
-                    self.cert_slot = self._root.CsBlob.Expr.CertSlot(self._io.read_u4be())
-                    self.data = self._root.CsBlob.Data(self._io, self, self._root)
-
+                    self.cert_slot = self._root.CsBlob.Expr.CertSlot(
+                        self._io.read_u4be())
+                    self.data = self._root.CsBlob.Data(
+                        self._io, self, self._root)
 
             class AppleGenericAnchorExpr(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
@@ -494,37 +518,38 @@ class MachO(KaitaiStruct):
                     if hasattr(self, '_m_value'):
                         return self._m_value if hasattr(self, '_m_value') else None
 
-                    self._m_value = u"anchor apple generic"
+                    self._m_value = "anchor apple generic"
                     return self._m_value if hasattr(self, '_m_value') else None
-
 
             class EntitlementFieldExpr(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
                     self._io = _io
                     self._parent = _parent
                     self._root = _root if _root else self
-                    self.data = self._root.CsBlob.Data(self._io, self, self._root)
-                    self.match = self._root.CsBlob.Match(self._io, self, self._root)
-
+                    self.data = self._root.CsBlob.Data(
+                        self._io, self, self._root)
+                    self.match = self._root.CsBlob.Match(
+                        self._io, self, self._root)
 
             class AndExpr(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
                     self._io = _io
                     self._parent = _parent
                     self._root = _root if _root else self
-                    self.left = self._root.CsBlob.Expr(self._io, self, self._root)
-                    self.right = self._root.CsBlob.Expr(self._io, self, self._root)
-
+                    self.left = self._root.CsBlob.Expr(
+                        self._io, self, self._root)
+                    self.right = self._root.CsBlob.Expr(
+                        self._io, self, self._root)
 
             class OrExpr(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
                     self._io = _io
                     self._parent = _parent
                     self._root = _root if _root else self
-                    self.left = self._root.CsBlob.Expr(self._io, self, self._root)
-                    self.right = self._root.CsBlob.Expr(self._io, self, self._root)
-
-
+                    self.left = self._root.CsBlob.Expr(
+                        self._io, self, self._root)
+                    self.right = self._root.CsBlob.Expr(
+                        self._io, self, self._root)
 
         class BlobIndex(KaitaiStruct):
 
@@ -537,11 +562,13 @@ class MachO(KaitaiStruct):
                 entitlements = 5
                 alternate_code_directories = 4096
                 signature_slot = 65536
+
             def __init__(self, _io, _parent=None, _root=None):
                 self._io = _io
                 self._parent = _parent
                 self._root = _root if _root else self
-                self.type = self._root.CsBlob.BlobIndex.CsslotType(self._io.read_u4be())
+                self.type = self._root.CsBlob.BlobIndex.CsslotType(
+                    self._io.read_u4be())
                 self.offset = self._io.read_u4be()
 
             @property
@@ -558,7 +585,6 @@ class MachO(KaitaiStruct):
                 io.seek(_pos)
                 return self._m_blob if hasattr(self, '_m_blob') else None
 
-
         class Match(KaitaiStruct):
 
             class Op(Enum):
@@ -571,15 +597,16 @@ class MachO(KaitaiStruct):
                 greater_than = 6
                 less_equal = 7
                 greater_equal = 8
+
             def __init__(self, _io, _parent=None, _root=None):
                 self._io = _io
                 self._parent = _parent
                 self._root = _root if _root else self
-                self.match_op = self._root.CsBlob.Match.Op(self._io.read_u4be())
+                self.match_op = self._root.CsBlob.Match.Op(
+                    self._io.read_u4be())
                 if self.match_op != self._root.CsBlob.Match.Op.exists:
-                    self.data = self._root.CsBlob.Data(self._io, self, self._root)
-
-
+                    self.data = self._root.CsBlob.Data(
+                        self._io, self, self._root)
 
         class Requirement(KaitaiStruct):
             def __init__(self, _io, _parent=None, _root=None):
@@ -589,14 +616,12 @@ class MachO(KaitaiStruct):
                 self.kind = self._io.read_u4be()
                 self.expr = self._root.CsBlob.Expr(self._io, self, self._root)
 
-
         class BlobWrapper(KaitaiStruct):
             def __init__(self, _io, _parent=None, _root=None):
                 self._io = _io
                 self._parent = _parent
                 self._root = _root if _root else self
                 self.data = self._io.read_bytes_full()
-
 
         class Entitlements(KaitaiStruct):
             def __init__(self, _io, _parent=None, _root=None):
@@ -606,17 +631,16 @@ class MachO(KaitaiStruct):
                 self.count = self._io.read_u4be()
                 self.items = [None] * (self.count)
                 for i in range(self.count):
-                    self.items[i] = self._root.CsBlob.EntitlementsBlobIndex(self._io, self, self._root)
-
-
-
+                    self.items[i] = self._root.CsBlob.EntitlementsBlobIndex(
+                        self._io, self, self._root)
 
     class SegmentCommand64(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
             self._root = _root if _root else self
-            self.segname = (KaitaiStream.bytes_strip_right(self._io.read_bytes(16), 0)).decode(u"ascii")
+            self.segname = (KaitaiStream.bytes_strip_right(
+                self._io.read_bytes(16), 0)).decode("ascii")
             self.vmaddr = self._io.read_u8le()
             self.vmsize = self._io.read_u8le()
             self.fileoff = self._io.read_u8le()
@@ -627,16 +651,18 @@ class MachO(KaitaiStruct):
             self.flags = self._io.read_u4le()
             self.sections = [None] * (self.nsects)
             for i in range(self.nsects):
-                self.sections[i] = self._root.SegmentCommand64.Section64(self._io, self, self._root)
-
+                self.sections[i] = self._root.SegmentCommand64.Section64(
+                    self._io, self, self._root)
 
         class Section64(KaitaiStruct):
             def __init__(self, _io, _parent=None, _root=None):
                 self._io = _io
                 self._parent = _parent
                 self._root = _root if _root else self
-                self.sect_name = (KaitaiStream.bytes_strip_right(self._io.read_bytes(16), 0)).decode(u"ascii")
-                self.seg_name = (KaitaiStream.bytes_strip_right(self._io.read_bytes(16), 0)).decode(u"ascii")
+                self.sect_name = (KaitaiStream.bytes_strip_right(
+                    self._io.read_bytes(16), 0)).decode("ascii")
+                self.seg_name = (KaitaiStream.bytes_strip_right(
+                    self._io.read_bytes(16), 0)).decode("ascii")
                 self.addr = self._io.read_u8le()
                 self.size = self._io.read_u8le()
                 self.offset = self._io.read_u4le()
@@ -655,9 +681,8 @@ class MachO(KaitaiStruct):
                     self._root = _root if _root else self
                     self.items = []
                     while not self._io.is_eof():
-                        self.items.append(self._root.SegmentCommand64.Section64.CfString(self._io, self, self._root))
-
-
+                        self.items.append(self._root.SegmentCommand64.Section64.CfString(
+                            self._io, self, self._root))
 
             class CfString(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
@@ -668,7 +693,6 @@ class MachO(KaitaiStruct):
                     self.info = self._io.read_u8le()
                     self.data = self._io.read_u8le()
                     self.length = self._io.read_u8le()
-
 
             class EhFrameItem(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
@@ -683,12 +707,13 @@ class MachO(KaitaiStruct):
                     if self.length > 0:
                         _on = self.id
                         if _on == 0:
-                            self._raw_body = self._io.read_bytes((self.length - 4))
+                            self._raw_body = self._io.read_bytes(
+                                (self.length - 4))
                             io = KaitaiStream(BytesIO(self._raw_body))
-                            self.body = self._root.SegmentCommand64.Section64.EhFrameItem.Cie(io, self, self._root)
+                            self.body = self._root.SegmentCommand64.Section64.EhFrameItem.Cie(
+                                io, self, self._root)
                         else:
                             self.body = self._io.read_bytes((self.length - 4))
-
 
                 class CharChain(KaitaiStruct):
                     def __init__(self, _io, _parent=None, _root=None):
@@ -697,9 +722,8 @@ class MachO(KaitaiStruct):
                         self._root = _root if _root else self
                         self.chr = self._io.read_u1()
                         if self.chr != 0:
-                            self.next = self._root.SegmentCommand64.Section64.EhFrameItem.CharChain(self._io, self, self._root)
-
-
+                            self.next = self._root.SegmentCommand64.Section64.EhFrameItem.CharChain(
+                                self._io, self, self._root)
 
                 class Cie(KaitaiStruct):
                     def __init__(self, _io, _parent=None, _root=None):
@@ -707,26 +731,26 @@ class MachO(KaitaiStruct):
                         self._parent = _parent
                         self._root = _root if _root else self
                         self.version = self._io.read_u1()
-                        self.aug_str = self._root.SegmentCommand64.Section64.EhFrameItem.CharChain(self._io, self, self._root)
-                        self.code_alignment_factor = self._root.Uleb128(self._io, self, self._root)
-                        self.data_alignment_factor = self._root.Uleb128(self._io, self, self._root)
+                        self.aug_str = self._root.SegmentCommand64.Section64.EhFrameItem.CharChain(
+                            self._io, self, self._root)
+                        self.code_alignment_factor = self._root.Uleb128(
+                            self._io, self, self._root)
+                        self.data_alignment_factor = self._root.Uleb128(
+                            self._io, self, self._root)
                         self.return_address_register = self._io.read_u1()
                         if self.aug_str.chr == 122:
-                            self.augmentation = self._root.SegmentCommand64.Section64.EhFrameItem.AugmentationEntry(self._io, self, self._root)
-
-
+                            self.augmentation = self._root.SegmentCommand64.Section64.EhFrameItem.AugmentationEntry(
+                                self._io, self, self._root)
 
                 class AugmentationEntry(KaitaiStruct):
                     def __init__(self, _io, _parent=None, _root=None):
                         self._io = _io
                         self._parent = _parent
                         self._root = _root if _root else self
-                        self.length = self._root.Uleb128(self._io, self, self._root)
+                        self.length = self._root.Uleb128(
+                            self._io, self, self._root)
                         if self._parent.aug_str.next.chr == 82:
                             self.fde_pointer_encoding = self._io.read_u1()
-
-
-
 
             class EhFrame(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
@@ -735,9 +759,8 @@ class MachO(KaitaiStruct):
                     self._root = _root if _root else self
                     self.items = []
                     while not self._io.is_eof():
-                        self.items.append(self._root.SegmentCommand64.Section64.EhFrameItem(self._io, self, self._root))
-
-
+                        self.items.append(self._root.SegmentCommand64.Section64.EhFrameItem(
+                            self._io, self, self._root))
 
             class PointerList(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
@@ -748,8 +771,6 @@ class MachO(KaitaiStruct):
                     while not self._io.is_eof():
                         self.items.append(self._io.read_u8le())
 
-
-
             class StringList(KaitaiStruct):
                 def __init__(self, _io, _parent=None, _root=None):
                     self._io = _io
@@ -757,9 +778,8 @@ class MachO(KaitaiStruct):
                     self._root = _root if _root else self
                     self.strings = []
                     while not self._io.is_eof():
-                        self.strings.append((self._io.read_bytes_term(0, False, True, True)).decode(u"ascii"))
-
-
+                        self.strings.append((self._io.read_bytes_term(
+                            0, False, True, True)).decode("ascii"))
 
             @property
             def data(self):
@@ -770,80 +790,95 @@ class MachO(KaitaiStruct):
                 _pos = io.pos()
                 io.seek(self.offset)
                 _on = self.sect_name
-                if _on == u"__objc_nlclslist":
+                if _on == "__objc_nlclslist":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(io, self, self._root)
-                elif _on == u"__objc_methname":
+                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(
+                        io, self, self._root)
+                elif _on == "__objc_methname":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.StringList(io, self, self._root)
-                elif _on == u"__nl_symbol_ptr":
+                    self._m_data = self._root.SegmentCommand64.Section64.StringList(
+                        io, self, self._root)
+                elif _on == "__nl_symbol_ptr":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(io, self, self._root)
-                elif _on == u"__la_symbol_ptr":
+                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(
+                        io, self, self._root)
+                elif _on == "__la_symbol_ptr":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(io, self, self._root)
-                elif _on == u"__objc_selrefs":
+                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(
+                        io, self, self._root)
+                elif _on == "__objc_selrefs":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(io, self, self._root)
-                elif _on == u"__cstring":
+                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(
+                        io, self, self._root)
+                elif _on == "__cstring":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.StringList(io, self, self._root)
-                elif _on == u"__objc_classlist":
+                    self._m_data = self._root.SegmentCommand64.Section64.StringList(
+                        io, self, self._root)
+                elif _on == "__objc_classlist":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(io, self, self._root)
-                elif _on == u"__objc_protolist":
+                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(
+                        io, self, self._root)
+                elif _on == "__objc_protolist":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(io, self, self._root)
-                elif _on == u"__objc_imageinfo":
+                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(
+                        io, self, self._root)
+                elif _on == "__objc_imageinfo":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(io, self, self._root)
-                elif _on == u"__objc_methtype":
+                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(
+                        io, self, self._root)
+                elif _on == "__objc_methtype":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.StringList(io, self, self._root)
-                elif _on == u"__cfstring":
+                    self._m_data = self._root.SegmentCommand64.Section64.StringList(
+                        io, self, self._root)
+                elif _on == "__cfstring":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.CfStringList(io, self, self._root)
-                elif _on == u"__objc_classrefs":
+                    self._m_data = self._root.SegmentCommand64.Section64.CfStringList(
+                        io, self, self._root)
+                elif _on == "__objc_classrefs":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(io, self, self._root)
-                elif _on == u"__objc_protorefs":
+                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(
+                        io, self, self._root)
+                elif _on == "__objc_protorefs":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(io, self, self._root)
-                elif _on == u"__objc_classname":
+                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(
+                        io, self, self._root)
+                elif _on == "__objc_classname":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.StringList(io, self, self._root)
-                elif _on == u"__got":
+                    self._m_data = self._root.SegmentCommand64.Section64.StringList(
+                        io, self, self._root)
+                elif _on == "__got":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(io, self, self._root)
-                elif _on == u"__eh_frame":
+                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(
+                        io, self, self._root)
+                elif _on == "__eh_frame":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.EhFrame(io, self, self._root)
-                elif _on == u"__objc_superrefs":
+                    self._m_data = self._root.SegmentCommand64.Section64.EhFrame(
+                        io, self, self._root)
+                elif _on == "__objc_superrefs":
                     self._raw__m_data = io.read_bytes(self.size)
                     io = KaitaiStream(BytesIO(self._raw__m_data))
-                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(io, self, self._root)
+                    self._m_data = self._root.SegmentCommand64.Section64.PointerList(
+                        io, self, self._root)
                 else:
                     self._m_data = io.read_bytes(self.size)
                 io.seek(_pos)
                 return self._m_data if hasattr(self, '_m_data') else None
-
-
 
     class DysymtabCommand(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -884,7 +919,6 @@ class MachO(KaitaiStruct):
             io.seek(_pos)
             return self._m_indirect_symbols if hasattr(self, '_m_indirect_symbols') else None
 
-
     class MachHeader(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
@@ -896,10 +930,8 @@ class MachO(KaitaiStruct):
             self.ncmds = self._io.read_u4le()
             self.sizeofcmds = self._io.read_u4le()
             self.flags = self._io.read_u4le()
-            if  ((self._root.magic == self._root.MagicType.macho_be_x64) or (self._root.magic == self._root.MagicType.macho_le_x64)) :
+            if ((self._root.magic == self._root.MagicType.macho_be_x64) or (self._root.magic == self._root.MagicType.macho_le_x64)):
                 self.reserved = self._io.read_u4le()
-
-
 
     class LinkeditDataCommand(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -908,7 +940,6 @@ class MachO(KaitaiStruct):
             self._root = _root if _root else self
             self.data_off = self._io.read_u4le()
             self.data_size = self._io.read_u4le()
-
 
     class Version(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -919,7 +950,6 @@ class MachO(KaitaiStruct):
             self.minor = self._io.read_u1()
             self.major = self._io.read_u1()
             self.release = self._io.read_u1()
-
 
     class CodeSignatureCommand(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -943,7 +973,6 @@ class MachO(KaitaiStruct):
             io.seek(_pos)
             return self._m_code_signature if hasattr(self, '_m_code_signature') else None
 
-
     class DyldInfoCommand(KaitaiStruct):
 
         class BindOpcode(Enum):
@@ -960,6 +989,7 @@ class MachO(KaitaiStruct):
             do_bind_add_address_uleb = 160
             do_bind_add_address_immediate_scaled = 176
             do_bind_uleb_times_skipping_uleb = 192
+
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
@@ -981,22 +1011,23 @@ class MachO(KaitaiStruct):
                 self._parent = _parent
                 self._root = _root if _root else self
                 self.opcode_and_immediate = self._io.read_u1()
-                if  ((self.opcode == self._root.DyldInfoCommand.BindOpcode.set_dylib_ordinal_uleb) or (self.opcode == self._root.DyldInfoCommand.BindOpcode.set_append_sleb) or (self.opcode == self._root.DyldInfoCommand.BindOpcode.set_segment_and_offset_uleb) or (self.opcode == self._root.DyldInfoCommand.BindOpcode.add_address_uleb) or (self.opcode == self._root.DyldInfoCommand.BindOpcode.do_bind_add_address_uleb) or (self.opcode == self._root.DyldInfoCommand.BindOpcode.do_bind_uleb_times_skipping_uleb)) :
+                if ((self.opcode == self._root.DyldInfoCommand.BindOpcode.set_dylib_ordinal_uleb) or (self.opcode == self._root.DyldInfoCommand.BindOpcode.set_append_sleb) or (self.opcode == self._root.DyldInfoCommand.BindOpcode.set_segment_and_offset_uleb) or (self.opcode == self._root.DyldInfoCommand.BindOpcode.add_address_uleb) or (self.opcode == self._root.DyldInfoCommand.BindOpcode.do_bind_add_address_uleb) or (self.opcode == self._root.DyldInfoCommand.BindOpcode.do_bind_uleb_times_skipping_uleb)):
                     self.uleb = self._root.Uleb128(self._io, self, self._root)
 
                 if self.opcode == self._root.DyldInfoCommand.BindOpcode.do_bind_uleb_times_skipping_uleb:
                     self.skip = self._root.Uleb128(self._io, self, self._root)
 
                 if self.opcode == self._root.DyldInfoCommand.BindOpcode.set_symbol_trailing_flags_immediate:
-                    self.symbol = (self._io.read_bytes_term(0, False, True, True)).decode(u"ascii")
-
+                    self.symbol = (self._io.read_bytes_term(
+                        0, False, True, True)).decode("ascii")
 
             @property
             def opcode(self):
                 if hasattr(self, '_m_opcode'):
                     return self._m_opcode if hasattr(self, '_m_opcode') else None
 
-                self._m_opcode = self._root.DyldInfoCommand.BindOpcode((self.opcode_and_immediate & 240))
+                self._m_opcode = self._root.DyldInfoCommand.BindOpcode(
+                    (self.opcode_and_immediate & 240))
                 return self._m_opcode if hasattr(self, '_m_opcode') else None
 
             @property
@@ -1006,7 +1037,6 @@ class MachO(KaitaiStruct):
 
                 self._m_immediate = (self.opcode_and_immediate & 15)
                 return self._m_immediate if hasattr(self, '_m_immediate') else None
-
 
         class RebaseData(KaitaiStruct):
 
@@ -1020,13 +1050,15 @@ class MachO(KaitaiStruct):
                 do_rebase_uleb_times = 96
                 do_rebase_add_address_uleb = 112
                 do_rebase_uleb_times_skipping_uleb = 128
+
             def __init__(self, _io, _parent=None, _root=None):
                 self._io = _io
                 self._parent = _parent
                 self._root = _root if _root else self
                 self.items = []
                 while True:
-                    _ = self._root.DyldInfoCommand.RebaseData.RebaseItem(self._io, self, self._root)
+                    _ = self._root.DyldInfoCommand.RebaseData.RebaseItem(
+                        self._io, self, self._root)
                     self.items.append(_)
                     if _.opcode == self._root.DyldInfoCommand.RebaseData.Opcode.done:
                         break
@@ -1037,19 +1069,21 @@ class MachO(KaitaiStruct):
                     self._parent = _parent
                     self._root = _root if _root else self
                     self.opcode_and_immediate = self._io.read_u1()
-                    if  ((self.opcode == self._root.DyldInfoCommand.RebaseData.Opcode.set_segment_and_offset_uleb) or (self.opcode == self._root.DyldInfoCommand.RebaseData.Opcode.add_address_uleb) or (self.opcode == self._root.DyldInfoCommand.RebaseData.Opcode.do_rebase_uleb_times) or (self.opcode == self._root.DyldInfoCommand.RebaseData.Opcode.do_rebase_add_address_uleb) or (self.opcode == self._root.DyldInfoCommand.RebaseData.Opcode.do_rebase_uleb_times_skipping_uleb)) :
-                        self.uleb = self._root.Uleb128(self._io, self, self._root)
+                    if ((self.opcode == self._root.DyldInfoCommand.RebaseData.Opcode.set_segment_and_offset_uleb) or (self.opcode == self._root.DyldInfoCommand.RebaseData.Opcode.add_address_uleb) or (self.opcode == self._root.DyldInfoCommand.RebaseData.Opcode.do_rebase_uleb_times) or (self.opcode == self._root.DyldInfoCommand.RebaseData.Opcode.do_rebase_add_address_uleb) or (self.opcode == self._root.DyldInfoCommand.RebaseData.Opcode.do_rebase_uleb_times_skipping_uleb)):
+                        self.uleb = self._root.Uleb128(
+                            self._io, self, self._root)
 
                     if self.opcode == self._root.DyldInfoCommand.RebaseData.Opcode.do_rebase_uleb_times_skipping_uleb:
-                        self.skip = self._root.Uleb128(self._io, self, self._root)
-
+                        self.skip = self._root.Uleb128(
+                            self._io, self, self._root)
 
                 @property
                 def opcode(self):
                     if hasattr(self, '_m_opcode'):
                         return self._m_opcode if hasattr(self, '_m_opcode') else None
 
-                    self._m_opcode = self._root.DyldInfoCommand.RebaseData.Opcode((self.opcode_and_immediate & 240))
+                    self._m_opcode = self._root.DyldInfoCommand.RebaseData.Opcode(
+                        (self.opcode_and_immediate & 240))
                     return self._m_opcode if hasattr(self, '_m_opcode') else None
 
                 @property
@@ -1060,18 +1094,18 @@ class MachO(KaitaiStruct):
                     self._m_immediate = (self.opcode_and_immediate & 15)
                     return self._m_immediate if hasattr(self, '_m_immediate') else None
 
-
-
         class ExportNode(KaitaiStruct):
             def __init__(self, _io, _parent=None, _root=None):
                 self._io = _io
                 self._parent = _parent
                 self._root = _root if _root else self
-                self.terminal_size = self._root.Uleb128(self._io, self, self._root)
+                self.terminal_size = self._root.Uleb128(
+                    self._io, self, self._root)
                 self.children_count = self._io.read_u1()
                 self.children = [None] * (self.children_count)
                 for i in range(self.children_count):
-                    self.children[i] = self._root.DyldInfoCommand.ExportNode.Child(self._io, self, self._root)
+                    self.children[i] = self._root.DyldInfoCommand.ExportNode.Child(
+                        self._io, self, self._root)
 
                 self.terminal = self._io.read_bytes(self.terminal_size.value)
 
@@ -1080,8 +1114,10 @@ class MachO(KaitaiStruct):
                     self._io = _io
                     self._parent = _parent
                     self._root = _root if _root else self
-                    self.name = (self._io.read_bytes_term(0, False, True, True)).decode(u"ascii")
-                    self.node_offset = self._root.Uleb128(self._io, self, self._root)
+                    self.name = (self._io.read_bytes_term(
+                        0, False, True, True)).decode("ascii")
+                    self.node_offset = self._root.Uleb128(
+                        self._io, self, self._root)
 
                 @property
                 def value(self):
@@ -1090,11 +1126,10 @@ class MachO(KaitaiStruct):
 
                     _pos = self._io.pos()
                     self._io.seek(self.node_offset.value)
-                    self._m_value = self._root.DyldInfoCommand.ExportNode(self._io, self, self._root)
+                    self._m_value = self._root.DyldInfoCommand.ExportNode(
+                        self._io, self, self._root)
                     self._io.seek(_pos)
                     return self._m_value if hasattr(self, '_m_value') else None
-
-
 
         class BindData(KaitaiStruct):
             def __init__(self, _io, _parent=None, _root=None):
@@ -1103,11 +1138,11 @@ class MachO(KaitaiStruct):
                 self._root = _root if _root else self
                 self.items = []
                 while True:
-                    _ = self._root.DyldInfoCommand.BindItem(self._io, self, self._root)
+                    _ = self._root.DyldInfoCommand.BindItem(
+                        self._io, self, self._root)
                     self.items.append(_)
                     if _.opcode == self._root.DyldInfoCommand.BindOpcode.done:
                         break
-
 
         class LazyBindData(KaitaiStruct):
             def __init__(self, _io, _parent=None, _root=None):
@@ -1116,9 +1151,8 @@ class MachO(KaitaiStruct):
                 self._root = _root if _root else self
                 self.items = []
                 while not self._io.is_eof():
-                    self.items.append(self._root.DyldInfoCommand.BindItem(self._io, self, self._root))
-
-
+                    self.items.append(self._root.DyldInfoCommand.BindItem(
+                        self._io, self, self._root))
 
         @property
         def rebase(self):
@@ -1130,7 +1164,8 @@ class MachO(KaitaiStruct):
             io.seek(self.rebase_off)
             self._raw__m_rebase = io.read_bytes(self.rebase_size)
             io = KaitaiStream(BytesIO(self._raw__m_rebase))
-            self._m_rebase = self._root.DyldInfoCommand.RebaseData(io, self, self._root)
+            self._m_rebase = self._root.DyldInfoCommand.RebaseData(
+                io, self, self._root)
             io.seek(_pos)
             return self._m_rebase if hasattr(self, '_m_rebase') else None
 
@@ -1144,7 +1179,8 @@ class MachO(KaitaiStruct):
             io.seek(self.bind_off)
             self._raw__m_bind = io.read_bytes(self.bind_size)
             io = KaitaiStream(BytesIO(self._raw__m_bind))
-            self._m_bind = self._root.DyldInfoCommand.BindData(io, self, self._root)
+            self._m_bind = self._root.DyldInfoCommand.BindData(
+                io, self, self._root)
             io.seek(_pos)
             return self._m_bind if hasattr(self, '_m_bind') else None
 
@@ -1158,7 +1194,8 @@ class MachO(KaitaiStruct):
             io.seek(self.lazy_bind_off)
             self._raw__m_lazy_bind = io.read_bytes(self.lazy_bind_size)
             io = KaitaiStream(BytesIO(self._raw__m_lazy_bind))
-            self._m_lazy_bind = self._root.DyldInfoCommand.LazyBindData(io, self, self._root)
+            self._m_lazy_bind = self._root.DyldInfoCommand.LazyBindData(
+                io, self, self._root)
             io.seek(_pos)
             return self._m_lazy_bind if hasattr(self, '_m_lazy_bind') else None
 
@@ -1172,10 +1209,10 @@ class MachO(KaitaiStruct):
             io.seek(self.export_off)
             self._raw__m_exports = io.read_bytes(self.export_size)
             io = KaitaiStream(BytesIO(self._raw__m_exports))
-            self._m_exports = self._root.DyldInfoCommand.ExportNode(io, self, self._root)
+            self._m_exports = self._root.DyldInfoCommand.ExportNode(
+                io, self, self._root)
             io.seek(_pos)
             return self._m_exports if hasattr(self, '_m_exports') else None
-
 
     class DylinkerCommand(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -1183,7 +1220,6 @@ class MachO(KaitaiStruct):
             self._parent = _parent
             self._root = _root if _root else self
             self.name = self._root.LcStr(self._io, self, self._root)
-
 
     class DylibCommand(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -1194,8 +1230,8 @@ class MachO(KaitaiStruct):
             self.timestamp = self._io.read_u4le()
             self.current_version = self._io.read_u4le()
             self.compatibility_version = self._io.read_u4le()
-            self.name = (self._io.read_bytes_term(0, False, True, True)).decode(u"utf-8")
-
+            self.name = (self._io.read_bytes_term(
+                0, False, True, True)).decode("utf-8")
 
     class LcStr(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -1203,8 +1239,8 @@ class MachO(KaitaiStruct):
             self._parent = _parent
             self._root = _root if _root else self
             self.length = self._io.read_u4le()
-            self.value = (self._io.read_bytes_term(0, False, True, True)).decode(u"UTF-8")
-
+            self.value = (self._io.read_bytes_term(
+                0, False, True, True)).decode("UTF-8")
 
     class LoadCommand(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -1221,7 +1257,8 @@ class MachO(KaitaiStruct):
             elif _on == self._root.LoadCommandType.source_version:
                 self._raw_body = self._io.read_bytes((self.size - 8))
                 io = KaitaiStream(BytesIO(self._raw_body))
-                self.body = self._root.SourceVersionCommand(io, self, self._root)
+                self.body = self._root.SourceVersionCommand(
+                    io, self, self._root)
             elif _on == self._root.LoadCommandType.load_dylinker:
                 self._raw_body = self._io.read_bytes((self.size - 8))
                 io = KaitaiStream(BytesIO(self._raw_body))
@@ -1237,7 +1274,8 @@ class MachO(KaitaiStruct):
             elif _on == self._root.LoadCommandType.function_starts:
                 self._raw_body = self._io.read_bytes((self.size - 8))
                 io = KaitaiStream(BytesIO(self._raw_body))
-                self.body = self._root.LinkeditDataCommand(io, self, self._root)
+                self.body = self._root.LinkeditDataCommand(
+                    io, self, self._root)
             elif _on == self._root.LoadCommandType.version_min_macosx:
                 self._raw_body = self._io.read_bytes((self.size - 8))
                 io = KaitaiStream(BytesIO(self._raw_body))
@@ -1245,7 +1283,8 @@ class MachO(KaitaiStruct):
             elif _on == self._root.LoadCommandType.data_in_code:
                 self._raw_body = self._io.read_bytes((self.size - 8))
                 io = KaitaiStream(BytesIO(self._raw_body))
-                self.body = self._root.LinkeditDataCommand(io, self, self._root)
+                self.body = self._root.LinkeditDataCommand(
+                    io, self, self._root)
             elif _on == self._root.LoadCommandType.uuid:
                 self._raw_body = self._io.read_bytes((self.size - 8))
                 io = KaitaiStream(BytesIO(self._raw_body))
@@ -1257,7 +1296,8 @@ class MachO(KaitaiStruct):
             elif _on == self._root.LoadCommandType.code_signature:
                 self._raw_body = self._io.read_bytes((self.size - 8))
                 io = KaitaiStream(BytesIO(self._raw_body))
-                self.body = self._root.CodeSignatureCommand(io, self, self._root)
+                self.body = self._root.CodeSignatureCommand(
+                    io, self, self._root)
             elif _on == self._root.LoadCommandType.dysymtab:
                 self._raw_body = self._io.read_bytes((self.size - 8))
                 io = KaitaiStream(BytesIO(self._raw_body))
@@ -1273,14 +1313,12 @@ class MachO(KaitaiStruct):
             else:
                 self.body = self._io.read_bytes((self.size - 8))
 
-
     class UuidCommand(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
             self._root = _root if _root else self
             self.uuid = self._io.read_bytes(16)
-
 
     class SymtabCommand(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -1300,11 +1338,11 @@ class MachO(KaitaiStruct):
                 self.unknown = self._io.read_u4le()
                 self.items = []
                 while True:
-                    _ = (self._io.read_bytes_term(0, False, True, True)).decode(u"ascii")
+                    _ = (self._io.read_bytes_term(
+                        0, False, True, True)).decode("ascii")
                     self.items.append(_)
-                    if _ == u"":
+                    if _ == "":
                         break
-
 
         class Nlist64(KaitaiStruct):
             def __init__(self, _io, _parent=None, _root=None):
@@ -1317,7 +1355,6 @@ class MachO(KaitaiStruct):
                 self.desc = self._io.read_u2le()
                 self.value = self._io.read_u8le()
 
-
         @property
         def symbols(self):
             if hasattr(self, '_m_symbols'):
@@ -1328,7 +1365,8 @@ class MachO(KaitaiStruct):
             io.seek(self.sym_off)
             self._m_symbols = [None] * (self.n_syms)
             for i in range(self.n_syms):
-                self._m_symbols[i] = self._root.SymtabCommand.Nlist64(io, self, self._root)
+                self._m_symbols[i] = self._root.SymtabCommand.Nlist64(
+                    io, self, self._root)
 
             io.seek(_pos)
             return self._m_symbols if hasattr(self, '_m_symbols') else None
@@ -1343,10 +1381,10 @@ class MachO(KaitaiStruct):
             io.seek(self.str_off)
             self._raw__m_strs = io.read_bytes(self.str_size)
             io = KaitaiStream(BytesIO(self._raw__m_strs))
-            self._m_strs = self._root.SymtabCommand.StrTable(io, self, self._root)
+            self._m_strs = self._root.SymtabCommand.StrTable(
+                io, self, self._root)
             io.seek(_pos)
             return self._m_strs if hasattr(self, '_m_strs') else None
-
 
     class VersionMinCommand(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -1356,7 +1394,6 @@ class MachO(KaitaiStruct):
             self.version = self._root.Version(self._io, self, self._root)
             self.reserved = self._root.Version(self._io, self, self._root)
 
-
     class EntryPointCommand(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
@@ -1364,6 +1401,3 @@ class MachO(KaitaiStruct):
             self._root = _root if _root else self
             self.entry_off = self._io.read_u8le()
             self.stack_size = self._io.read_u8le()
-
-
-

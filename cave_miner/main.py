@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Search for code cave in all binaries
 Usage:
@@ -11,34 +12,44 @@ Options:
   --size=<size>    The minimum size of the cave in bytes [default: 256]
   --bytes=<bytes>  The bytes used in the code cave [default: 0x00]
 """
+import re
 from docopt import docopt
 from cave_miner import *
 
-def print_banner():
-  print """
-    {gy}/========\{e}
-   {gy}/{e}    {gn}||{e}    {gy}\{e}
-        {gn}||{e}
-        {gn}||{e}
-        {gn}||{e}
-   CAVE {gn}||{e} MINER
-  """.format(gy=Bcolors.GREY, gn=Bcolors.GREEN, e=Bcolors.ENDC)
 
-def main():
-  print_banner()
-  args = docopt(__doc__, version='0.1')
-  CONTINUE = True
+def print_banner() -> None:
+    banner = r'''
+         /========\
+        /    ||    \
+             ||
+             ||
+             ||
+        CAVE || MINER
+    '''
+    banner = banner.replace('||', '{green}||{endc}')
+    banner = banner.replace('/', '{grey}/{endc}')
+    banner = banner.replace('\\', '{grey}\\{endc}')
+    banner = banner.replace('=', '{grey}={endc}')
+    print(color(banner))
 
-  if args["search"] == True:
-    CONTINUE = CONTINUE and test_file(args["<file_name>"])
-    CONTINUE = CONTINUE and test_number(args["--size"])
-    CONTINUE = CONTINUE and test_bytes(args["--bytes"])
 
-    if CONTINUE: search(args["<file_name>"], args["--size"], args["--bytes"])
+def main() -> None:
+    print_banner()
+    args = docopt(__doc__, version='0.1')
+    CONTINUE = True
 
-  elif args["inject"] == True:
-    CONTINUE = CONTINUE and test_file(args["<payload>"])
-    CONTINUE = CONTINUE and test_file(args["<file_name>"])
-    CONTINUE = CONTINUE and test_number(args["<address>"])
+    if args["search"] == True:
+        CONTINUE = CONTINUE and test_file(args["<file_name>"])
+        CONTINUE = CONTINUE and test_number(args["--size"])
+        CONTINUE = CONTINUE and test_bytes(args["--bytes"])
 
-    if CONTINUE: inject(args["<payload>"], args["<file_name>"], args["<address>"])
+        if CONTINUE:
+            search(args["<file_name>"], args["--size"], args["--bytes"])
+
+    elif args["inject"] == True:
+        CONTINUE = CONTINUE and test_file(args["<payload>"])
+        CONTINUE = CONTINUE and test_file(args["<file_name>"])
+        CONTINUE = CONTINUE and test_number(args["<address>"])
+
+        if CONTINUE:
+            inject(args["<payload>"], args["<file_name>"], args["<address>"])

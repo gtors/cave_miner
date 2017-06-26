@@ -1,17 +1,17 @@
-from utils import *
+from contextlib import ExitStack
+from .utils import *
 
-def inject(payload_name, file_name, straddr):
-  print "{}[*]{} Starting injection into binary...{}".format(Bcolors.YELLOW, Bcolors.BOLD, Bcolors.ENDC)
-  print
-  addr = parse_int(straddr)
 
-  payload = open(payload_name, "rb").read()
-  vic = open(file_name, "rb").read()
+def inject(payload_name: str, file_name: str, straddr: str) -> None:
+    print(color("{yellow}[*]{bold} Starting injection into binary...{endc}")
 
-  res = vic[:addr] + payload + vic[addr + len(payload):]
+    addr = parse_int(straddr)
 
-  f = open("{}.mod".format(file_name), "w")
-  f.write(res)
-  f.close()
+    with ExitStack() as stack:
+        payload = stack.enter_context(open(payload_name, "rb")).read()
+        victim = stack.enter_context(open(file_name, "rb")).read()
 
-  print "{}[*]{} Injection finished.{}".format(Bcolors.YELLOW, Bcolors.BOLD, Bcolors.ENDC)
+        buf = victim[:addr] + payload + victim[addr + len(payload):]
+        stack.enter_context(open(f"{file_name}.mod", "w")).write(buf)
+
+    print(color("{yellow}[*]{bold} Injection finished.{endc}")

@@ -7,7 +7,9 @@ import struct
 
 
 if parse_version(ks_version) < parse_version('0.7'):
-    raise Exception("Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s" % (ks_version))
+    raise Exception(
+        "Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s" % (ks_version))
+
 
 class Elf(KaitaiStruct):
 
@@ -106,6 +108,7 @@ class Elf(KaitaiStruct):
         executable = 2
         shared = 3
         core = 4
+
     def __init__(self, _io, _parent=None, _root=None):
         self._io = _io
         self._parent = _parent
@@ -113,7 +116,8 @@ class Elf(KaitaiStruct):
         self._read()
 
     def _read(self):
-        self.magic = self._io.ensure_fixed_contents(struct.pack('4b', 127, 69, 76, 70))
+        self.magic = self._io.ensure_fixed_contents(
+            struct.pack('4b', 127, 69, 76, 70))
         self.bits = self._root.Bits(self._io.read_u1())
         self.endian = self._root.Endian(self._io.read_u1())
         self.ei_version = self._io.read_u1()
@@ -286,7 +290,6 @@ class Elf(KaitaiStruct):
                 elif _on == self._root.Bits.b64:
                     self.align = self._io.read_u8be()
 
-
         class SectionHeader(KaitaiStruct):
             def __init__(self, _io, _parent=None, _root=None, _is_le=None):
                 self._io = _io
@@ -397,12 +400,13 @@ class Elf(KaitaiStruct):
                 _pos = io.pos()
                 io.seek(self.name_offset)
                 if self._is_le:
-                    self._m_name = (io.read_bytes_term(0, False, True, True)).decode(u"ASCII")
+                    self._m_name = (io.read_bytes_term(
+                        0, False, True, True)).decode("ASCII")
                 else:
-                    self._m_name = (io.read_bytes_term(0, False, True, True)).decode(u"ASCII")
+                    self._m_name = (io.read_bytes_term(
+                        0, False, True, True)).decode("ASCII")
                 io.seek(_pos)
                 return self._m_name if hasattr(self, '_m_name') else None
-
 
         class StringsStruct(KaitaiStruct):
             def __init__(self, _io, _parent=None, _root=None, _is_le=None):
@@ -421,15 +425,14 @@ class Elf(KaitaiStruct):
             def _read_le(self):
                 self.entries = []
                 while not self._io.is_eof():
-                    self.entries.append((self._io.read_bytes_term(0, False, True, True)).decode(u"ASCII"))
-
+                    self.entries.append((self._io.read_bytes_term(
+                        0, False, True, True)).decode("ASCII"))
 
             def _read_be(self):
                 self.entries = []
                 while not self._io.is_eof():
-                    self.entries.append((self._io.read_bytes_term(0, False, True, True)).decode(u"ASCII"))
-
-
+                    self.entries.append((self._io.read_bytes_term(
+                        0, False, True, True)).decode("ASCII"))
 
         @property
         def program_headers(self):
@@ -439,20 +442,26 @@ class Elf(KaitaiStruct):
             _pos = self._io.pos()
             self._io.seek(self.program_header_offset)
             if self._is_le:
-                self._raw__m_program_headers = [None] * (self.qty_program_header)
+                self._raw__m_program_headers = [
+                    None] * (self.qty_program_header)
                 self._m_program_headers = [None] * (self.qty_program_header)
                 for i in range(self.qty_program_header):
-                    self._raw__m_program_headers[i] = self._io.read_bytes(self.program_header_entry_size)
+                    self._raw__m_program_headers[i] = self._io.read_bytes(
+                        self.program_header_entry_size)
                     io = KaitaiStream(BytesIO(self._raw__m_program_headers[i]))
-                    self._m_program_headers[i] = self._root.EndianElf.ProgramHeader(io, self, self._root, self._is_le)
+                    self._m_program_headers[i] = self._root.EndianElf.ProgramHeader(
+                        io, self, self._root, self._is_le)
 
             else:
-                self._raw__m_program_headers = [None] * (self.qty_program_header)
+                self._raw__m_program_headers = [
+                    None] * (self.qty_program_header)
                 self._m_program_headers = [None] * (self.qty_program_header)
                 for i in range(self.qty_program_header):
-                    self._raw__m_program_headers[i] = self._io.read_bytes(self.program_header_entry_size)
+                    self._raw__m_program_headers[i] = self._io.read_bytes(
+                        self.program_header_entry_size)
                     io = KaitaiStream(BytesIO(self._raw__m_program_headers[i]))
-                    self._m_program_headers[i] = self._root.EndianElf.ProgramHeader(io, self, self._root, self._is_le)
+                    self._m_program_headers[i] = self._root.EndianElf.ProgramHeader(
+                        io, self, self._root, self._is_le)
 
             self._io.seek(_pos)
             return self._m_program_headers if hasattr(self, '_m_program_headers') else None
@@ -465,20 +474,26 @@ class Elf(KaitaiStruct):
             _pos = self._io.pos()
             self._io.seek(self.section_header_offset)
             if self._is_le:
-                self._raw__m_section_headers = [None] * (self.qty_section_header)
+                self._raw__m_section_headers = [
+                    None] * (self.qty_section_header)
                 self._m_section_headers = [None] * (self.qty_section_header)
                 for i in range(self.qty_section_header):
-                    self._raw__m_section_headers[i] = self._io.read_bytes(self.section_header_entry_size)
+                    self._raw__m_section_headers[i] = self._io.read_bytes(
+                        self.section_header_entry_size)
                     io = KaitaiStream(BytesIO(self._raw__m_section_headers[i]))
-                    self._m_section_headers[i] = self._root.EndianElf.SectionHeader(io, self, self._root, self._is_le)
+                    self._m_section_headers[i] = self._root.EndianElf.SectionHeader(
+                        io, self, self._root, self._is_le)
 
             else:
-                self._raw__m_section_headers = [None] * (self.qty_section_header)
+                self._raw__m_section_headers = [
+                    None] * (self.qty_section_header)
                 self._m_section_headers = [None] * (self.qty_section_header)
                 for i in range(self.qty_section_header):
-                    self._raw__m_section_headers[i] = self._io.read_bytes(self.section_header_entry_size)
+                    self._raw__m_section_headers[i] = self._io.read_bytes(
+                        self.section_header_entry_size)
                     io = KaitaiStream(BytesIO(self._raw__m_section_headers[i]))
-                    self._m_section_headers[i] = self._root.EndianElf.SectionHeader(io, self, self._root, self._is_le)
+                    self._m_section_headers[i] = self._root.EndianElf.SectionHeader(
+                        io, self, self._root, self._is_le)
 
             self._io.seek(_pos)
             return self._m_section_headers if hasattr(self, '_m_section_headers') else None
@@ -491,15 +506,16 @@ class Elf(KaitaiStruct):
             _pos = self._io.pos()
             self._io.seek(self.section_headers[self.section_names_idx].offset)
             if self._is_le:
-                self._raw__m_strings = self._io.read_bytes(self.section_headers[self.section_names_idx].size)
+                self._raw__m_strings = self._io.read_bytes(
+                    self.section_headers[self.section_names_idx].size)
                 io = KaitaiStream(BytesIO(self._raw__m_strings))
-                self._m_strings = self._root.EndianElf.StringsStruct(io, self, self._root, self._is_le)
+                self._m_strings = self._root.EndianElf.StringsStruct(
+                    io, self, self._root, self._is_le)
             else:
-                self._raw__m_strings = self._io.read_bytes(self.section_headers[self.section_names_idx].size)
+                self._raw__m_strings = self._io.read_bytes(
+                    self.section_headers[self.section_names_idx].size)
                 io = KaitaiStream(BytesIO(self._raw__m_strings))
-                self._m_strings = self._root.EndianElf.StringsStruct(io, self, self._root, self._is_le)
+                self._m_strings = self._root.EndianElf.StringsStruct(
+                    io, self, self._root, self._is_le)
             self._io.seek(_pos)
             return self._m_strings if hasattr(self, '_m_strings') else None
-
-
-
